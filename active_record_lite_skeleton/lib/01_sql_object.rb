@@ -107,7 +107,21 @@ class SQLObject
   end
 
   def update
-    # ...
+    cols = self.class.columns.dup
+    cols.delete(:id)
+    col_names = cols.map {|col| "#{col} = ?"}.join(',')
+
+    sql_statement = <<-SQL
+    UPDATE
+    #{self.class.to_s.downcase}s
+    SET
+    (#{col_names})
+    WHERE
+      ?
+    SQL
+
+    DBConnection.execute(sql_statement, *attribute_values[1..-1], attribute_values[0])
+
   end
 
   def save
