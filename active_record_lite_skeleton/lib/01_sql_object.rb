@@ -5,7 +5,6 @@ require 'active_support/inflector'
 
 class SQLObject
 
-  self.table_name = self.to_s.tableize
 
   def self.columns
 #  p instance_variables
@@ -19,12 +18,18 @@ class SQLObject
   def self.finalize!
   end
 
+  def self.set_table_name(table_name)
+    define_method(table_name) do
+      self.table_name = table_name.to_s
+    end
+  end
+
   def self.table_name=(table_name)
-    # ...
+    @table_name = table_name
   end
 
   def self.table_name
-    # ...
+    @table_name = self.to_s.tableize
   end
 
   def self.all
