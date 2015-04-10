@@ -7,12 +7,29 @@ class SQLObject
 
 
   def self.columns
-#  p instance_variables
-    self.instance_variables.each do |iv|
-      define_method(("#{iv}"[2..-1]).to_sym) do
-        self.instance_variable_get(iv)
+    columns = DBConnection.execute2(<<-SQL)
+      SELECT
+        *
+      FROM
+        #{self.table_name}
+
+    SQL
+    .first.map(&:to_sym)
+
+    columns.each do |col|
+      #setter
+      define_method(col) do
+        # iv = self.instance_variable_get("@#{col.to_s}".to_sym)
+        attributes[col]
+      end
+      #getter
+      define_method("#{col}=") do |val|
+        attributes[col] = val
+        # self.instance_variable_set("@#{col.to_s}", val)
       end
     end
+
+    columns
   end
 
   def self.finalize!
@@ -45,7 +62,7 @@ class SQLObject
   end
 
   def attributes
-    # ...
+    @attributes ||= {}
   end
 
   def attribute_values
