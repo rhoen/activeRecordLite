@@ -103,6 +103,7 @@ class SQLObject
       (#{question_marks})
     SQL
     DBConnection.execute(sql_statement, *attribute_values[1..-1])
+    self.id = DBConnection.last_insert_row_id
   end
 
   def update
