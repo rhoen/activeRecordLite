@@ -86,11 +86,19 @@ class SQLObject
   end
 
   def attribute_values
-    # ...
+    self.class.columns.map {|col| self.send(col)}
   end
 
   def insert
-    # ...
+    columns = self.class.columns.join(', ')
+    question_marks = ['?'] * attribute_values.size
+    sql_statement = <<-SQL
+    INSERT INTO
+      #{self.class.to_s.downcase}s #{columns}
+    VALUES
+      #{question_marks}
+    SQL
+    DBConnection.execute(sql_statement, *attribute_values)
   end
 
   def update
