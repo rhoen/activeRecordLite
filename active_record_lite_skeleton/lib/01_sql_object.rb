@@ -86,17 +86,19 @@ class SQLObject
   end
 
   def attribute_values
-    self.class.columns.map {|col| self.send(col)}
+    self.class.columns.map {|col| self.send(col) unless col.to_sym == :id}
   end
 
   def insert
-    columns = self.class.columns.join(', ')
-    question_marks = ['?'] * attribute_values.size
+    cols = self.class.columns.dup
+    cols.delete(:id)
+    col_names = cols.join(',')
+    question_marks = (['?'] * attribute_values.size).join(',')
     sql_statement = <<-SQL
     INSERT INTO
-      #{self.class.to_s.downcase}s #{columns}
+      #{self.class.to_s.downcase}s (#{col_names})
     VALUES
-      #{question_marks}
+      (#{question_marks})
     SQL
     DBConnection.execute(sql_statement, *attribute_values)
   end
