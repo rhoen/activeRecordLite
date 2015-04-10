@@ -1,3 +1,4 @@
+require 'byebug'
 require_relative 'db_connection'
 require_relative '01_sql_object'
 
@@ -11,12 +12,12 @@ module Searchable
       SELECT
         *
       FROM
-        #{self.class.to_s.downcase}
+        #{self.to_s.downcase}s
       WHERE
         #{where_line}
     SQL
 
-    DBConnection.execute(sql_statement, params.values)
+    parse_all DBConnection.execute(sql_statement, params.values)
   end
 end
 
