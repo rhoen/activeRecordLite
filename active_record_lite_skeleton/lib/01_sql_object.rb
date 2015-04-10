@@ -4,7 +4,11 @@ require 'active_support/inflector'
 # of this project. It was only a warm up.
 
 class SQLObject
+
+  self.table_name = self.to_s.tableize
+
   def self.columns
+#  p instance_variables
     self.instance_variables.each do |iv|
       define_method(("#{iv}"[2..-1]).to_sym) do
         self.instance_variable_get(iv)
