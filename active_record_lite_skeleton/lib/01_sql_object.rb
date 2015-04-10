@@ -18,18 +18,14 @@ class SQLObject
   def self.finalize!
   end
 
-  def self.set_table_name(table_name)
-    define_method(table_name) do
-      self.table_name = table_name.to_s
-    end
-  end
+
 
   def self.table_name=(table_name)
     @table_name = table_name
   end
 
   def self.table_name
-    @table_name = self.to_s.tableize
+    @table_name ||= self.to_s.tableize
   end
 
   def self.all
