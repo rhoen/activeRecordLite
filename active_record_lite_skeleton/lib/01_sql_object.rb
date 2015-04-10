@@ -15,7 +15,9 @@ class SQLObject
 
     SQL
     .first.map(&:to_sym)
+  end
 
+  def self.finalize!
     columns.each do |col|
       #setter
       define_method(col) do
@@ -28,11 +30,6 @@ class SQLObject
         # self.instance_variable_set("@#{col.to_s}", val)
       end
     end
-
-    columns
-  end
-
-  def self.finalize!
   end
 
 
@@ -46,23 +43,32 @@ class SQLObject
   end
 
   def self.all
-    define_method(all)
     sql_statement = <<-SQL
     SELECT
-    #{class.to_s.downcase}s.*
+      #{self.new.class.to_s.downcase}s.*
     FROM
-      #{class.to_s.downcase}s
+      #{self.new.class.to_s.downcase}s
     SQL
-    DBConnection.execute(sql_statement)
+    parse_all DBConnection.execute(sql_statement)
 
   end
 
   def self.parse_all(results)
-    # ...
+    results.map do |result|
+      self.new(result)
+    end
   end
 
   def self.find(id)
-    # ...
+    sql_statement = <<-SQL
+    SELECT
+      #{self.new.class.to_s.downcase}s.*
+    FROM
+    #{self.new.class.to_s.downcase}s
+    WHERE
+    #{self.new.class.to_s.downcase}s.id = ?
+    SQL
+    parse_all(DBConnection.execute(sql_statement, id)).first
   end
 
   def initialize(params = {})
