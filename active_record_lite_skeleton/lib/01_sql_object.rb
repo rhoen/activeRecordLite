@@ -110,7 +110,7 @@ class SQLObject
     cols = self.class.columns.dup
     cols.delete(:id)
     col_names = cols.map {|col| "#{col} = ?"}.join(',')
-    
+
     sql_statement = <<-SQL
     UPDATE
     #{self.class.to_s.downcase}s
@@ -125,6 +125,10 @@ class SQLObject
   end
 
   def save
-    # ...
+    if self.id.nil?
+      insert
+    else
+      update
+    end
   end
 end
