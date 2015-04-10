@@ -46,7 +46,15 @@ class SQLObject
   end
 
   def self.all
-    # ...
+    define_method(all)
+    sql_statement = <<-SQL
+    SELECT
+    #{class.to_s.downcase}s.*
+    FROM
+      #{class.to_s.downcase}s
+    SQL
+    DBConnection.execute(sql_statement)
+
   end
 
   def self.parse_all(results)
