@@ -5,7 +5,11 @@ require 'active_support/inflector'
 
 class SQLObject
   def self.columns
-    # ...
+    self.instance_variables.each do |iv|
+      define_method(("#{iv}"[2..-1]).to_sym) do
+        self.instance_variable_get(iv)
+      end
+    end
   end
 
   def self.finalize!
