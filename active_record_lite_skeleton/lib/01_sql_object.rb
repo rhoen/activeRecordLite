@@ -1,3 +1,4 @@
+require 'byebug'
 require_relative 'db_connection'
 require 'active_support/inflector'
 # NB: the attr_accessor we wrote in phase 0 is NOT used in the rest
@@ -86,21 +87,22 @@ class SQLObject
   end
 
   def attribute_values
-    self.class.columns.map {|col| self.send(col) unless col.to_sym == :id}
+    self.class.columns.map {|col| self.send(col) }
   end
 
   def insert
     cols = self.class.columns.dup
     cols.delete(:id)
     col_names = cols.join(',')
-    question_marks = (['?'] * attribute_values.size).join(',')
+    question_marks = (['?'] * (attribute_values.size - 1)).join(',')
+    # byebug
     sql_statement = <<-SQL
     INSERT INTO
       #{self.class.to_s.downcase}s (#{col_names})
     VALUES
       (#{question_marks})
     SQL
-    DBConnection.execute(sql_statement, *attribute_values)
+    DBConnection.execute(sql_statement, *attribute_values[1..-1])
   end
 
   def update
