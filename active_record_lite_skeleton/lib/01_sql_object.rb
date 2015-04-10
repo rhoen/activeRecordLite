@@ -110,12 +110,12 @@ class SQLObject
     cols = self.class.columns.dup
     cols.delete(:id)
     col_names = cols.map {|col| "#{col} = ?"}.join(',')
-
+    
     sql_statement = <<-SQL
     UPDATE
     #{self.class.to_s.downcase}s
     SET
-    (#{col_names})
+    #{col_names}
     WHERE
       ?
     SQL
